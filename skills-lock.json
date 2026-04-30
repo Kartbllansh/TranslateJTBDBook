@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "baoyu-translate": {
+      "source": "jimliu/baoyu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/baoyu-translate/SKILL.md",
+      "computedHash": "3dc723aa4b86c4c6b8557faeec558e54f5bce5f9cf39aa629dd588ed6531df20"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
@@ -12,6 +18,18 @@
       "sourceType": "github",
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "marketing-strategist": {
+      "source": "ncklrs/startup-os-skills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-strategist/SKILL.md",
+      "computedHash": "35887adfce794b8b03f78e3e76463b1b61f96b51f1d32fd65fbb328c6ea5d012"
+    },
+    "technical-writer": {
+      "source": "onewave-ai/claude-skills",
+      "sourceType": "github",
+      "skillPath": "technical-writer/SKILL.md",
+      "computedHash": "91f95ce88d7f311aa1eb1ca00e2dbfe629383c00a7bf076effb0e3af9e051b76"
     },
     "translate-book-parallel": {
       "source": "aradotso/trending-skills",

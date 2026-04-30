@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Когда кофе и капуста конкурируют | Читалка</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="library" id="library">
+        <div class="brand">
+          <span class="brand-mark">JTBD</span>
+          <div>
+            <p class="eyebrow">Перевод книги</p>
+            <h1>Когда кофе и капуста конкурируют</h1>
+          </div>
+        </div>
+
+        <label class="search-wrap">
+          <span>Поиск</span>
+          <input id="searchInput" type="search" placeholder="Работа, прогресс, конкуренция...">
+        </label>
+
+        <div class="library-meta">
+          <span id="chapterCount">20 файлов</span>
+          <span id="wordCount">~53 тыс. слов</span>
+        </div>
+
+        <nav class="chapter-list" id="chapterList" aria-label="Главы"></nav>
+
+        <div class="translator-credit">
+          <span>Перевод и подготовка</span>
+          <a href="https://t.me/mark0vartem" target="_blank" rel="noreferrer">@mark0vartem</a>
+          <p>Нашли ошибку в переводе? Напишите, обновлю.</p>
+        </div>
+      </aside>
+
+      <main class="reader">
+        <header class="topbar">
+          <button class="icon-button mobile-menu" id="menuButton" aria-label="Открыть оглавление" title="Оглавление">
+            <span></span><span></span><span></span>
+          </button>
+
+          <div class="current">
+            <span id="currentKicker">Предисловие</span>
+            <strong id="currentTitle">Загрузка...</strong>
+          </div>
+
+          <div class="tools" aria-label="Настройки чтения">
+            <button class="tool-button font-tool smaller" id="decreaseFont" title="Уменьшить текст" aria-label="Уменьшить текст">
+              <span>A</span>
+            </button>
+            <button class="tool-button font-tool larger" id="increaseFont" title="Увеличить текст" aria-label="Увеличить текст">
+              <span>A</span>
+            </button>
+            <button class="tool-button" id="themeToggle" title="Сменить тему" aria-label="Сменить тему">◐</button>
+          </div>
+        </header>
+
+        <div class="progress-track" aria-hidden="true">
+          <span id="readProgress"></span>
+        </div>
+
+        <section class="hero" id="hero">
+          <div>
+            <p class="eyebrow">Jobs to be Done</p>
+            <h2>Книга о том, почему люди «нанимают» продукты, когда хотят сдвинуть жизнь вперёд.</h2>
+          </div>
+          <div class="cover-stack" aria-label="Обложка книги">
+            <img src="./cover.png" alt="Обложка When Coffee and Kale Compete">
+            <div class="hero-stats">
+            <span><strong>14</strong> глав</span>
+            <span><strong>3</strong> приложения</span>
+            <span><strong>53k</strong> слов</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace">
+          <aside class="section-rail" id="sectionRail" aria-label="Разделы главы"></aside>
+          <article class="book-page" id="content" aria-live="polite">
+            <div class="loading">Собираю страницы...</div>
+          </article>
+        </section>
+
+        <footer class="pager">
+          <button id="prevChapter">← Предыдущая</button>
+          <button id="nextChapter">Следующая →</button>
+        </footer>
+      </main>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>

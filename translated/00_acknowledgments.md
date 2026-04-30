@@ -1,0 +1,8 @@
+# Благодарности
+
+Эта книга представляет не идеи одного человека, а вклад многих людей. Все, кто перечислен здесь, а также те, чьи имена я по ошибке пропустил, помогли мне понять JTBD и тем самым помогли написать эту книгу. Я в долгу перед ними и перед всем JTBD-сообществом.
+
+Tim Zenderman, Samuel Hulick, Leslie Owensby, Michael Sacca, Willis Jackson III, Morgan Ranieri, Andrej Balaz, Daphne Lin, Matthew Woo, Matt Brooks, Mat Budelman, Eric White, David Wu, Bob Moesta, John Palmer, Rick Pedi, Chris Spiek, Ervin Fowlkes, Timur Kunayev, Matthew Gunson, Alex Yang, Ryan D. Hmesatch, Leslie Owensby, Marc Galbraith, Daryl Choy, James Ramsay, Joshua Porter, Tor L. Bollingmo, Martin Jordan, Ryan Singer, Laura Roeder, Justin Jackson, Vincent van der Lubbe, Ash Maurya, Benedict Evans, Esteban Mancuso, Des Traynor, Paul Adams, Sian Townsend и вся команда Intercom, Daniel Ritzenthaler, Dan Martell, Anthony Francavilla, Omer Yariv, Justin Sinclair, Joanna Wiebe, Paulo Peres, Alexander Horré, Bleau Alexandru, Tom Masiero, Jose A. de Miguel, Dimitri Nassis, Roman Meliška, Paul Gonzalez, Lee Yanco, Thomas Fröhlich, Lou Franco, David Emmett, Thomas Huetter, Nir Benita, Kyle Fiedler, Trace Wax и команда thoughtbot, все участники NYC JTBD Meetup, Amrita Chandra, Jeremy Horn, David Lee, Barry Clark, Ryan Witt, Boris Grinkot, Alex Lumley, Claudio Perrone, Omar Gonzalez, Ain Tohvri, Amit Vemuri, Sri Vemuri, Hiten Shah, Paul Sullivan, Matthew Woo, Joanna Wiebe, George White, Dave Rothschild, Elvin Turner, Mike Rivera, Jason Evanish, Levi Kovacs и Debbie Szumylo.
+
+Alan Klement  
+2 октября 2016 года
