@@ -22,10 +22,20 @@ def main() -> int:
     state_path = project_dir / "pipeline-state.json"
 
     if not metadata_path.exists():
-        print(f"Missing metadata.json: {metadata_path}", file=sys.stderr)
+        print(
+            f"Missing metadata.json: {metadata_path}\n"
+            "Expected a project created with:\n"
+            "  python -m book_pipeline.init_project --pdf <book.pdf> --title <title>",
+            file=sys.stderr,
+        )
         return 2
     if not state_path.exists():
-        print(f"Missing pipeline-state.json: {state_path}", file=sys.stderr)
+        print(
+            f"Missing pipeline-state.json: {state_path}\n"
+            "The project state file is required for status reporting. "
+            "Restore it from review/backups/ or recreate the project metadata.",
+            file=sys.stderr,
+        )
         return 2
 
     metadata = read_json(metadata_path)

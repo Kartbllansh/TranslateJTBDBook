@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -66,12 +67,31 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    for option_name, language_code in (
+        ("--source-language", args.source_language),
+        ("--target-language", args.target_language),
+    ):
+        if not re.fullmatch(r"[a-z]{2}", language_code):
+            print(
+                f"{option_name} must be a 2-letter ISO language code, got: {language_code}",
+                file=sys.stderr,
+            )
+            return 2
+
     pdf_path = Path(args.pdf)
     if not pdf_path.exists():
-        print(f"PDF not found: {pdf_path}", file=sys.stderr)
+        print(
+            f"PDF not found: {pdf_path}\n"
+            "Check the --pdf path and rerun init_project with an existing PDF file.",
+            file=sys.stderr,
+        )
         return 2
     if not pdf_path.is_file():
-        print(f"PDF path is not a file: {pdf_path}", file=sys.stderr)
+        print(
+            f"PDF path is not a file: {pdf_path}\n"
+            "Pass the path to a single PDF file, not a directory.",
+            file=sys.stderr,
+        )
         return 2
 
     title = args.title or pdf_path.stem

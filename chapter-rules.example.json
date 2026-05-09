@@ -1,0 +1,28 @@
+{
+  "chapters": [
+    {
+      "id": "00_foreword",
+      "title": "Foreword",
+      "start_pattern": "^# Foreword",
+      "end_pattern": null
+    },
+    {
+      "id": "01_chapter",
+      "title": "Chapter 1: Introduction",
+      "start_pattern": "^# Chapter 1",
+      "end_pattern": null
+    },
+    {
+      "id": "02_chapter",
+      "title": "Chapter 2: Background",
+      "start_pattern": "^# Chapter 2",
+      "end_pattern": null
+    },
+    {
+      "id": "15_appendix",
+      "title": "Appendix A: Additional Resources",
+      "start_pattern": "^# Appendix A",
+      "end_pattern": null
+    }
+  ]
+}

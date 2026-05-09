@@ -11,12 +11,24 @@ import argparse
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
-from book_pipeline.common import update_pipeline_stage
+from book_pipeline.common import read_json, update_pipeline_stage, write_json
 
 
 DEFAULT_FORMAT = "markdown,json"
+
+
+@dataclass(frozen=True)
+class ExtractionOptions:
+    format: str = DEFAULT_FORMAT
+    image_output: str = "external"
+    use_struct_tree: bool = False
+    pages: str | None = None
+    use_cli: bool = False
+    hybrid: str | None = None
+    sanitize: bool = False
 
 
 def parse_args() -> argparse.Namespace:
@@ -83,7 +95,12 @@ def main() -> int:
     project_dir = Path(args.project_dir) if args.project_dir else None
     input_paths = resolve_input_paths(args.input, project_dir)
     if not input_paths:
-        print("No input PDF provided. Pass a PDF path or use --project-dir.", file=sys.stderr)
+        print(
+            "No input PDF provided.\n"
+            "Pass a PDF path directly or use --project-dir so the command can read "
+            "<project-dir>/input/book.pdf.",
+            file=sys.stderr,
+        )
         return 2
 
     output_dir = resolve_output_dir(args.output_dir, project_dir)
@@ -103,10 +120,55 @@ def main() -> int:
     else:
         result = run_python_api(args, input_paths, output_dir)
 
-    if result == 0 and project_dir:
-        update_pipeline_stage(project_dir, "extract", "done")
+    if result == 0:
+        if args.image_output == "external":
+            try:
+                image_count = record_extracted_images(output_dir)
+                if image_count:
+                    print(f"Recorded {image_count} extracted image reference(s)")
+            except Exception as error:
+                print(f"Warning: failed to record extracted images: {error}", file=sys.stderr)
+        if project_dir:
+            update_pipeline_stage(project_dir, "extract", "done")
 
     return result
+
+
+def extract_project(
+    project_dir: Path,
+    options: ExtractionOptions | None = None,
+) -> None:
+    options = options or ExtractionOptions()
+    input_paths = resolve_input_paths([], project_dir)
+    output_dir = resolve_output_dir(None, project_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    if not input_paths or not Path(input_paths[0]).exists():
+        raise FileNotFoundError(
+            f"Project input PDF not found: {project_dir / 'input' / 'book.pdf'}"
+        )
+
+    if not shutil.which("java"):
+        raise ValueError(
+            "Java was not found in PATH. opendataloader-pdf requires Java 11+."
+        )
+
+    args = argparse.Namespace(
+        format=options.format,
+        image_output=options.image_output,
+        use_struct_tree=options.use_struct_tree,
+        sanitize=options.sanitize,
+        hybrid=options.hybrid,
+        pages=options.pages,
+        use_cli=options.use_cli,
+    )
+    result = run_cli(args, input_paths, output_dir) if options.use_cli else run_python_api(args, input_paths, output_dir)
+    if result != 0:
+        raise RuntimeError(f"PDF extraction failed with exit code {result}")
+
+    if options.image_output == "external":
+        record_extracted_images(output_dir)
+    update_pipeline_stage(project_dir, "extract", "done")
 
 
 def resolve_input_paths(raw_inputs: list[str], project_dir: Path | None) -> list[str]:
@@ -188,6 +250,46 @@ def run_cli(args: argparse.Namespace, input_paths: list[str], output_dir: Path) 
 
     completed = subprocess.run(command, check=False)
     return completed.returncode
+
+
+def record_extracted_images(output_dir: Path) -> int:
+    """Record externally extracted images in extraction metadata."""
+
+    images_dir = output_dir / "images"
+    if not images_dir.exists():
+        return 0
+
+    images = [
+        {
+            "filename": path.name,
+            "path": str(Path("images") / path.relative_to(images_dir)).replace("\\", "/"),
+        }
+        for path in sorted(images_dir.rglob("*"))
+        if path.is_file()
+    ]
+    if not images:
+        return 0
+
+    metadata_path = resolve_extraction_metadata_path(output_dir)
+    metadata = read_json(metadata_path) if metadata_path.exists() else {}
+    if not isinstance(metadata, dict):
+        metadata = {"opendataloader_payload": metadata}
+
+    book_pipeline_meta = metadata.setdefault("book_pipeline", {})
+    book_pipeline_meta["images"] = images
+    book_pipeline_meta["image_count"] = len(images)
+    write_json(metadata_path, metadata)
+    return len(images)
+
+
+def resolve_extraction_metadata_path(output_dir: Path) -> Path:
+    preferred = output_dir / "extracted.json"
+    if preferred.exists():
+        return preferred
+    json_files = sorted(output_dir.glob("*.json"))
+    if json_files:
+        return json_files[0]
+    return preferred
 
 
 if __name__ == "__main__":
