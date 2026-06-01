@@ -9,6 +9,10 @@
   --accent-2: #0e6f64;
   --accent-3: #e1b44d;
   --panel: rgba(255, 250, 240, .72);
+  --figure-shell: rgba(255, 250, 240, .82);
+  --figure-paper: #fffaf0;
+  --figure-line: rgba(49, 45, 37, .18);
+  --figure-caption: #665f54;
   --shadow: 0 24px 70px rgba(47, 37, 19, .16);
   --reader-size: 19px;
   --font-body: Georgia, "Times New Roman", serif;
@@ -26,6 +30,10 @@
   --accent-2: #58b7a9;
   --accent-3: #d3a13a;
   --panel: rgba(32, 35, 33, .78);
+  --figure-shell: #121516;
+  --figure-paper: #f6f0e3;
+  --figure-line: rgba(239, 225, 198, .18);
+  --figure-caption: #c7bea9;
   --shadow: 0 24px 70px rgba(0, 0, 0, .34);
 }
 
@@ -482,6 +490,17 @@ h1 {
   margin: 0 0 1.05em;
 }
 
+.book-page a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration-thickness: .08em;
+  text-underline-offset: .16em;
+}
+
+.book-page a:hover {
+  color: var(--accent-2);
+}
+
 .book-page ul,
 .book-page ol {
   margin: 0 0 1.2em;
@@ -510,6 +529,53 @@ h1 {
   background: color-mix(in srgb, var(--ink) 10%, transparent);
   font-family: "Courier New", monospace;
   font-size: .9em;
+}
+
+.book-figure {
+  margin: 34px 0 38px;
+}
+
+.figure-frame {
+  padding: clamp(12px, 2.6vw, 22px);
+  border: 1px solid var(--figure-line);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 38%),
+    var(--figure-shell);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--paper-strong) 58%, transparent),
+    0 16px 36px rgba(0, 0, 0, .08);
+}
+
+.book-figure img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(72vh, 760px);
+  margin: 0 auto;
+  padding: clamp(8px, 1.8vw, 14px);
+  border: 1px solid color-mix(in srgb, var(--figure-line) 82%, transparent);
+  border-radius: 5px;
+  background: var(--figure-paper);
+}
+
+.book-figure figcaption {
+  max-width: 760px;
+  margin: 11px auto 0;
+  color: var(--figure-caption);
+  font: 700 .86em/1.48 var(--font-ui);
+  text-align: center;
+}
+
+[data-theme="night"] .figure-frame {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .035),
+    0 18px 46px rgba(0, 0, 0, .32);
+}
+
+[data-theme="night"] .book-figure img {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .22);
 }
 
 .loading {

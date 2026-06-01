@@ -3,11 +3,14 @@ import path from "node:path";
 
 const root = process.cwd();
 const readerDir = path.join(root, "reader");
+const figureDir = path.join(readerDir, "images");
 const translatedDir = path.join(root, "translated");
 const outDir = path.join(root, "dist");
 const outFile = "when-coffee-and-kale-compete-ru.html";
+const figureCount = 36;
 
 const chapterMeta = [
+  { file: "00_translator_note.md", label: "T", kind: "От переводчика" },
   { file: "00_foreword.md", label: "00", kind: "Вступление" },
   { file: "00_acknowledgments.md", label: "00", kind: "Вступление" },
   { file: "01_chapter.md", label: "01", kind: "Часть I" },
@@ -47,12 +50,13 @@ const chapters = await Promise.all(
 );
 
 const embeddedChapters = JSON.stringify(chapters).replace(/</g, "\\u003c");
+const embeddedFigureMap = JSON.stringify(await buildFigureImageMap()).replace(/</g, "\\u003c");
 const coverData = `data:image/png;base64,${cover.toString("base64")}`;
 
 const standalone = html
   .replace('<link rel="stylesheet" href="./styles.css">', () => `<style>\n${css}\n</style>`)
   .replace('src="./cover.png"', () => `src="${coverData}"`)
-  .replace('<script src="./app.js"></script>', () => `<script>\nwindow.EMBEDDED_CHAPTERS = ${embeddedChapters};\n</script>\n<script>\n${js}\n</script>`)
+  .replace('<script src="./app.js"></script>', () => `<script>\nwindow.EMBEDDED_CHAPTERS = ${embeddedChapters};\nwindow.FIGURE_IMAGE_MAP = ${embeddedFigureMap};\n</script>\n<script>\n${js}\n</script>`)
   .replace("</title>", () => " · один файл</title>")
   .replace("</head>", () => '<meta name="description" content="Автономная HTML-читалка перевода книги When Coffee and Kale Compete.">\n  </head>');
 
@@ -74,4 +78,14 @@ function formatBytes(bytes) {
     unit += 1;
   }
   return `${size.toFixed(size >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
+}
+
+async function buildFigureImageMap() {
+  const map = {};
+  for (let figure = 1; figure <= figureCount; figure += 1) {
+    const imageName = `imageFile${figure + 1}.png`;
+    const image = await readFile(path.join(figureDir, imageName));
+    map[String(figure)] = `data:image/png;base64,${image.toString("base64")}`;
+  }
+  return map;
 }

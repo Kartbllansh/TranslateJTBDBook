@@ -1,4 +1,5 @@
 const chapters = window.EMBEDDED_CHAPTERS || [
+  { file: "00_translator_note.md", label: "T", kind: "От переводчика" },
   { file: "00_foreword.md", label: "00", kind: "Вступление" },
   { file: "00_acknowledgments.md", label: "00", kind: "Вступление" },
   { file: "01_chapter.md", label: "01", kind: "Часть I" },
@@ -20,6 +21,8 @@ const chapters = window.EMBEDDED_CHAPTERS || [
   { file: "17_appendix.md", label: "A17", kind: "Приложение" },
   { file: "18_notes.md", label: "N18", kind: "Примечания" }
 ];
+
+const figureImageMap = window.FIGURE_IMAGE_MAP || createDefaultFigureImageMap();
 
 const els = {
   chapterList: document.querySelector("#chapterList"),
@@ -65,16 +68,17 @@ async function init() {
 
 async function loadChapter(chapter, index) {
   if (typeof chapter.raw === "string") {
-    const title = chapter.title || (chapter.raw.match(/^#\s+(.+)$/m) || [null, chapter.file])[1];
-    const words = chapter.words || countWords(chapter.raw);
-    return { ...chapter, index, title, words };
+    const raw = injectFigureImages(chapter.raw);
+    const title = chapter.title || (raw.match(/^#\s+(.+)$/m) || [null, chapter.file])[1];
+    const words = chapter.words || countWords(raw);
+    return { ...chapter, index, raw, title, words };
   }
 
   const response = await fetch(`../translated/${chapter.file}`);
   if (!response.ok) {
     throw new Error(`Не удалось загрузить ${chapter.file}`);
   }
-  const raw = await response.text();
+  const raw = injectFigureImages(await response.text());
   const title = (raw.match(/^#\s+(.+)$/m) || [null, chapter.file])[1];
   const words = countWords(raw);
   return { ...chapter, index, raw, title, words };
@@ -166,6 +170,23 @@ function renderSections() {
   headings.forEach((heading) => sectionObserver.observe(heading));
 }
 
+function injectFigureImages(markdown) {
+  const existingFigures = new Set(
+    [...markdown.matchAll(/!\[[^\]]*(?:Рис\.|Figure)\s*(\d+)/gi)].map((match) => match[1])
+  );
+  const insertedFigures = new Set();
+
+  return markdown.replace(/^(\*\*Рис\.\s*(\d+)[^\n]*)$/gm, (match, line, figureNumber) => {
+    const imageSrc = figureImageMap[figureNumber];
+    if (!imageSrc || existingFigures.has(figureNumber) || insertedFigures.has(figureNumber)) {
+      return match;
+    }
+
+    insertedFigures.add(figureNumber);
+    return `![Рис. ${figureNumber}](${imageSrc})\n\n${line}`;
+  });
+}
+
 function markdownToHtml(markdown) {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const html = [];
@@ -183,12 +204,13 @@ function markdownToHtml(markdown) {
     quote = [];
   };
 
-  lines.forEach((line) => {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     const trimmed = line.trim();
     if (!trimmed) {
       closeList();
       closeQuote();
-      return;
+      continue;
     }
 
     const heading = trimmed.match(/^(#{1,3})\s+(.+)$/);
@@ -196,13 +218,27 @@ function markdownToHtml(markdown) {
       closeList();
       closeQuote();
       html.push(`<h${heading[1].length}>${inline(heading[2])}</h${heading[1].length}>`);
-      return;
+      continue;
+    }
+
+    const image = parseImageLine(trimmed);
+    if (image) {
+      closeList();
+      closeQuote();
+      const caption = findFollowingFigureCaption(lines, index);
+      if (caption) {
+        html.push(renderFigure(image.src, image.alt, caption.text));
+        index = caption.index;
+      } else {
+        html.push(renderFigure(image.src, image.alt));
+      }
+      continue;
     }
 
     if (trimmed.startsWith(">")) {
       closeList();
       quote.push(trimmed.replace(/^>\s?/, ""));
-      return;
+      continue;
     }
 
     const unordered = trimmed.match(/^[-*]\s+(.+)$/);
@@ -216,24 +252,84 @@ function markdownToHtml(markdown) {
         list = type;
       }
       html.push(`<li>${inline((unordered || ordered)[1])}</li>`);
-      return;
+      continue;
     }
 
     closeList();
     closeQuote();
     html.push(`<p>${inline(trimmed)}</p>`);
-  });
+  }
 
   closeList();
   closeQuote();
   return html.join("\n");
 }
 
+function parseImageLine(line) {
+  const match = line.match(/^!\[([^\]]*)]\((?:<([^>]+)>|([^)]+))\)$/);
+  if (!match) return null;
+  return {
+    alt: match[1],
+    src: match[2] || match[3]
+  };
+}
+
+function findFollowingFigureCaption(lines, imageLineIndex) {
+  let index = imageLineIndex + 1;
+  while (index < lines.length && !lines[index].trim()) {
+    index += 1;
+  }
+
+  const line = lines[index]?.trim();
+  if (!line || !/^\*\*Рис\.\s*\d+/.test(line)) return null;
+  return {
+    index,
+    text: normalizeFigureCaption(line)
+  };
+}
+
+function normalizeFigureCaption(line) {
+  return line
+    .replace(/^\*\*(Рис\.\s*\d+\.?)\*\*\s*/, "$1 ")
+    .replace(/^\*\*/, "")
+    .replace(/\*\*$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function renderFigure(src, alt, caption = "") {
+  const fallbackAlt = caption || alt || "Иллюстрация";
+  return `
+    <figure class="book-figure">
+      <div class="figure-frame">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(fallbackAlt)}" loading="lazy">
+      </div>
+      ${caption ? `<figcaption>${inline(caption)}</figcaption>` : ""}
+    </figure>
+  `;
+}
+
 function inline(value) {
-  return escapeHtml(value)
+  const links = [];
+  const createLink = (href, text = href) => {
+    const token = `@@LINK_${links.length}@@`;
+    links.push(`<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`);
+    return token;
+  };
+
+  const linked = escapeHtml(value)
+    .replace(/\[([^\]]+)]\((https?:\/\/[^)\s]+)\)/g, (_match, text, href) => createLink(href, text))
+    .replace(/\bhttps?:\/\/[^\s<]+/g, (match) => {
+      const punctuation = match.match(/[.,;:!?)]$/)?.[0] || "";
+      const href = punctuation ? match.slice(0, -1) : match;
+      return `${createLink(href)}${punctuation}`;
+    });
+
+  return linked
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/@@LINK_(\d+)@@/g, (_match, index) => links[Number(index)]);
 }
 
 function filterDocs(query) {
@@ -288,6 +384,14 @@ function closeLibrary() {
 
 function countWords(value) {
   return (value.match(/[A-Za-zА-Яа-яЁё0-9-]+/g) || []).length;
+}
+
+function createDefaultFigureImageMap() {
+  const map = {};
+  for (let figure = 1; figure <= 36; figure += 1) {
+    map[String(figure)] = `images/imageFile${figure + 1}.png`;
+  }
+  return map;
 }
 
 function createStore() {
