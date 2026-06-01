@@ -25,6 +25,12 @@
       "skillPath": "skills/marketing-strategist/SKILL.md",
       "computedHash": "35887adfce794b8b03f78e3e76463b1b61f96b51f1d32fd65fbb328c6ea5d012"
     },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "skillPath": "skills/next-best-practices/SKILL.md",
+      "computedHash": "11b1a7fd05148a807d8c14bdfa0e652b92246aeac9cd6a4223e9d3245163bc78"
+    },
     "technical-writer": {
       "source": "onewave-ai/claude-skills",
       "sourceType": "github",
@@ -36,6 +42,12 @@
       "sourceType": "github",
       "skillPath": "skills/translate-book-parallel/SKILL.md",
       "computedHash": "47ca0dee0e2a2ddf85c5c76eea964a20c83b99318baaea072cbb651829abe783"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "6b526d013e28073246a36f99b529bc43745d30832ecfa8217b359c34f260ca6b"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",

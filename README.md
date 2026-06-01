@@ -1,6 +1,6 @@
 # TranslateJTBDBook
 
-Локальный проект для перевода книги и экспериментов с пайплайном “PDF → Markdown → перевод → reader → standalone HTML”.
+Локальный проект для перевода книги и экспериментов с пайплайном “PDF → Markdown → перевод → reader → standalone HTML / Next.js site”.
 
 ## Быстрый старт с opendataloader-pdf
 
@@ -45,10 +45,34 @@ python3 -m venv .venv
 
 ## Публикация текущего перевода
 
+### Next.js сайт для GitHub Pages
+
+Требования:
+
+- Node.js 22+
+- npm
+
+Локальный запуск:
+
+```bash
+npm install
+npm run dev
+```
+
+Статическая сборка для GitHub Pages:
+
+```bash
+npm run pages:build
+```
+
+Готовый сайт появится в `out/`. При пуше в `main` workflow `.github/workflows/deploy-pages.yml` сам соберёт Next.js static export и опубликует его в GitHub Pages. Для project pages base path вычисляется автоматически из имени репозитория.
+
+### Автономный HTML
+
 Собрать автономный HTML-файл:
 
 ```bash
-node tools/build-single-html.mjs
+npm run build:single-html
 ```
 
 Готовый файл:

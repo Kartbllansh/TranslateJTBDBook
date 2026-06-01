@@ -2,3 +2,8 @@ projects/
 __pycache__/
 .venv/
 *.pyc
+node_modules/
+.next/
+out/
+npm-debug.log*
+.next-pages-server*.log
